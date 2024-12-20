@@ -49,8 +49,25 @@ RUN pip --no-cache-dir --disable-pip-version-check install poetry wheel
 RUN useradd -u $UID -Ulmr -d /home/openstates openstates
 USER openstates:openstates
 
+#RUN poetry run pip install django-allauth==0.48.0 --no-use-pep517
+
+# After the poetry/wheel installation but before running poetry install
+# RUN pip install --no-cache-dir setuptools==59.6.0
+# RUN pip install --no-cache-dir wheel
+# RUN pip install --no-cache-dir django-allauth==0.48.0
+# RUN poetry config virtualenvs.create false \
+#     && poetry install --no-dev \
+#     && rm -rf ~/.cache/pypoetry/cache ~/.cache/pypoetry/artifacts/
+
+# First do poetry install without django-allauth
 RUN poetry install --no-dev \
+    && poetry run pip install setuptools wheel \
+    && poetry run pip install django-allauth==0.48.0  --no-use-pep517 \
     && rm -r ~/.cache/pypoetry/cache ~/.cache/pypoetry/artifacts/
+
+
+#RUN poetry install --no-dev \
+#    && ~/.cache/pypoetry/artifacts/
 
 USER root
 RUN apt-get remove -y -qq build-essential \
